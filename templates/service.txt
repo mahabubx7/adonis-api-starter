@@ -1,0 +1,14 @@
+import {{model}} from 'App/Models/{{model}}'
+
+export default class MyService {
+  constructor(private readonly model = {{model}}) {}
+
+  /**
+   * Get one by id
+   * @param id number
+   * @returns Promise<{{model}}>
+   */
+  public async getById(id: number) {
+    return this.model.findOrFail(id)
+  }
+}
