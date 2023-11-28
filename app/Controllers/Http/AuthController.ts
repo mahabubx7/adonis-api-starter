@@ -1,6 +1,8 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import { UserService, MailService, TokenService } from 'App/Services'
+import Hash from '@ioc:Adonis/Core/Hash'
+import ChangePasswordInput from 'App/Validators/ChangePasswordInput'
 import LoginInputValidator from 'App/Validators/LoginInputValidator'
 import RegisterInputValidator from 'App/Validators/RegisterInputValidator'
 
@@ -115,6 +117,23 @@ export default class AuthController {
       .catch((err) => {
         return response.internalServerError({ message: 'Something went wrong!', errors: err })
       })
+  }
+
+  // Change Password
+  public async changePassword({ request, auth, response }: HttpContextContract) {
+    const { current, password } = await request.validate(ChangePasswordInput)
+    const { id } = await auth.use('api').authenticate()
+    if (!auth.isAuthenticated) {
+      return response.unauthorized({ message: 'You are not authorized!' })
+    }
+    const update = await this.userService.changePassword(id, current, password)
+
+    if (!update) {
+      return response.badRequest({ message: 'Current password not matched!' })
+    }
+
+    // send a notify email to user
+    return response.accepted({ message: 'Password changed successfully!' })
   }
 
   // SEND Email Verification :: Resend

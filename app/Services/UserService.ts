@@ -9,6 +9,7 @@
 |
 |*/
 
+import Hash from '@ioc:Adonis/Core/Hash'
 import User from 'App/Models/User'
 
 export class UserService {
@@ -58,6 +59,22 @@ export class UserService {
    */
   public async makeEmailVerified(email: string) {
     return this.model.query().where('email', email).update({ isEmailVerified: true })
+  }
+
+  /**
+   * Update user's password | Reset or Change
+   * @param id number
+   * @param pass string
+   * @returns Promise<false | any[]>
+   */
+  public async changePassword(id: number, old: string, pass: string) {
+    const user = await this.model.findOrFail(id)
+    const isSame = await Hash.verify(user.password, old)
+    if (!isSame) {
+      return false // password not matched
+    }
+    const newPassword = await Hash.make(pass)
+    return this.model.query().where('id', id).update({ password: newPassword })
   }
 
   /**
