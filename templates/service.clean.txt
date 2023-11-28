@@ -1,0 +1,17 @@
+/*
+|-------------------------------------------------------------
+| @{{name}} class
+| @Author: Mahabub (@mahabubx7)
+|-------------------------------------------------------------
+|
+| This is a service class that can be used for unspecified
+| custom domain based services
+|
+|*/
+
+
+export class {{name}} {
+  constructor() {}
+
+  // define your service as you need from scratch
+}

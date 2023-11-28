@@ -45,20 +45,76 @@ export default class Service extends BaseCommand {
       this.logger.error(`❌ ${this.name} service class already exists.`)
       return
     }
-    const model = await this.prompt.ask('Enter the model class (Please use capital at starts):', {
-      default: this.name,
-      result: (value) => value.trim(),
-    })
-    // generate the service class file
-    this.generator
-      .addFile(this.name, {
-        extname: '.ts',
+
+    const serviceType = await this.prompt.choice('Select the service type:', [
+      {
+        name: 'Model based',
+        message: 'Use Model based service',
+      },
+      {
+        name: 'Addon based',
+        message: 'Use Addon based service',
+      },
+      {
+        name: 'Custom',
+        message: 'Make a clean service from scratch',
+      },
+    ])
+
+    if (serviceType === 'Addon based') {
+      /**
+       * @Addon
+       * By Default, the addon name is same as the service class name.
+       * Ask user to enter the addon name.
+       */
+      const addon = await this.prompt.ask('Enter the addon name (start with capital):', {
+        default: this.name,
+        result: (value) => value.trim(),
       })
-      .appRoot(this.application.appRoot)
-      .destinationDir('app/Services')
-      .useMustache()
-      .stub(join(__dirname, '../templates/service.txt'))
-      .apply({ model, name: this.name })
+      this.generator
+        .addFile(this.name, {
+          extname: '.ts',
+        })
+        .appRoot(this.application.appRoot)
+        .destinationDir('app/Services')
+        .useMustache()
+        .stub(join(__dirname, '../templates/service.addon.txt'))
+        .apply({ addon, name: this.name })
+    } else if (serviceType === 'Custom') {
+      /**
+       * @Custom
+       * It will be a raw service class without additional setups.
+       */
+      this.generator
+        .addFile(this.name, {
+          extname: '.ts',
+        })
+        .appRoot(this.application.appRoot)
+        .destinationDir('app/Services')
+        .useMustache()
+        .stub(join(__dirname, '../templates/service.clean.txt'))
+        .apply({ name: this.name })
+    } else {
+      /**
+       * @Model
+       * By Default, the model class name is same as the service class name.
+       * Ask user to enter the model class name.
+       */
+      const model = await this.prompt.ask('Enter the model name (start with capital):', {
+        default: this.name,
+        result: (value) => value.trim(),
+      })
+      // generate the service class file
+      this.generator
+        .addFile(this.name, {
+          extname: '.ts',
+        })
+        .appRoot(this.application.appRoot)
+        .destinationDir('app/Services')
+        .useMustache()
+        .stub(join(__dirname, '../templates/service.txt'))
+        .apply({ model, name: this.name })
+    }
 
     await this.generator.run() // class file created
     this.logger.success(`✅ ${this.name} service class created successfully.`)

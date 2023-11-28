@@ -1,11 +1,6 @@
-import mjml from 'mjml'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
-import { UserService } from 'App/Services'
-import Env from '@ioc:Adonis/Core/Env'
-import Mail from '@ioc:Adonis/Addons/Mail'
-import View from '@ioc:Adonis/Core/View'
-import Route from '@ioc:Adonis/Core/Route'
+import { UserService, MailService, TokenService } from 'App/Services'
 import LoginInputValidator from 'App/Validators/LoginInputValidator'
 import RegisterInputValidator from 'App/Validators/RegisterInputValidator'
 
@@ -34,60 +29,86 @@ export default class AuthController {
   }
 
   // LOGIN
-  public async login({ request, auth }: HttpContextContract) {
+  public async login({ request, auth, response }: HttpContextContract) {
     /*-------------------------------------------------------
     | @Sanitized:  Validating user-inputs
     | @Auth:       Login a user!
     *-------------------------------------------------------*/
     const { email, password } = await request.validate(LoginInputValidator)
     const token = await auth.use('api').attempt(email, password, {
-      expiresIn: '10 days',
+      expiresIn: '7 days',
+      ip_address: request.ip(),
     })
 
-    return token
+    return response.accepted({
+      message: 'Login successfully!',
+      token,
+    })
   }
 
   // LOGOUT
-  public async logout({ auth }: HttpContextContract) {
+  public async logout({ auth, response }: HttpContextContract) {
     /*-------------------------------------------------------
     | @Auth:   Logout user & revoked token
     *-------------------------------------------------------*/
     await auth.use('api').revoke()
-    return { revoked: true }
+    return response.accepted({
+      message: 'Logout successfully!',
+      revoked: true,
+    })
   }
 
   // REGISTER
-  public async register({ request, auth }: HttpContextContract) {
+  public async register({ request, auth, response }: HttpContextContract) {
     const payload = await request.validate(RegisterInputValidator)
     /*-------------------------------------------------------
     | @Sanitized:  Validating user-inputs
     | @Auth:       Registering new user!
     *-------------------------------------------------------*/
     const user = await this.userService.create(payload)
-    const token = await auth.use('api').login(user, {
-      expiresIn: '10 days',
+
+    const token = await auth.use('api').generate(user, {
+      expiresIn: '7 days',
+      ip_address: request.ip(),
     })
-    return {
+
+    /**
+     * @MailService: Send a verification email to user
+     * @Params: email string
+     * @Params: name string [I didn't have 'name' field so I passed email as name]
+     * @Params: expiresIn string [optional]
+     */
+    await MailService.sendEmailVerification(user.email, user.email) // send email verification
+
+    return response.created({
+      message: 'User registered successfully!',
       token,
-      data: user,
-    }
+      user,
+    })
   }
 
   // VERIFY Email
   public async verifyEmail({ request, response }: HttpContextContract) {
     /*-------------------------------------------------------
-    | @Sanitized:  Validating user-request link
+    | @Sanitized:  Validating user-request OTP
     | @Auth:       Verify user's email
     *-------------------------------------------------------*/
+    // validate OTP
+    const { otp } = await request.validate({
+      schema: schema.create({
+        otp: schema.string({ trim: true }, [rules.minLength(6)]),
+      }),
+    })
 
-    // verify signature from requested url
-    if (!request.hasValidSignature()) {
-      return response.badRequest({ message: 'Invalid url provided!' })
+    // verify OTP
+    const payload = await TokenService.verifyOtp(otp)
+    if (!payload) {
+      return response.badRequest({ message: 'Invalid or expired OTP!' })
     }
 
     // update user's email verify status
     await this.userService
-      .makeEmailVerified(request.params().email)
+      .makeEmailVerified(payload.email)
       .then(() => {
         return response.accepted({ message: 'Email verified successfully!' })
       })
@@ -111,27 +132,13 @@ export default class AuthController {
       }),
     })
 
-    // compose email
-    const verifyLink = Route.makeSignedUrl('verifyEmail', {
-      email, // if your model has 'name' property, you can pass it here
-      expiresIn: '30m',
-    })
-
-    const rendered = mjml(
-      await View.render('verify_email', {
-        name: email,
-        verifyLink: `${Env.get('DOMAIN')}${verifyLink}`,
-      })
-    ).html
-
-    // enqueue to send a email
-    await Mail.sendLater((mail) => {
-      mail
-        .to(email)
-        .from('noreply@company.mail', 'XCompany')
-        .subject('XCompany - Email Verification!')
-        .html(rendered)
-    })
+    /**
+     * @MailService: Send a verification email to user
+     * @Params: email string
+     * @Params: name string [I didn't have 'name' field so I passed email as name]
+     * @Params: expiresIn string [optional]
+     */
+    await MailService.sendEmailVerification(email, email) // send email verification
 
     return { message: 'Email verification link has been sent successfully!' }
   }
