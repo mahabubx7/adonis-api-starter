@@ -1,7 +1,7 @@
 import mjml from 'mjml'
-import User from 'App/Models/User'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
+import { UserService } from 'App/Services'
 import Env from '@ioc:Adonis/Core/Env'
 import Mail from '@ioc:Adonis/Addons/Mail'
 import View from '@ioc:Adonis/Core/View'
@@ -10,7 +10,20 @@ import LoginInputValidator from 'App/Validators/LoginInputValidator'
 import RegisterInputValidator from 'App/Validators/RegisterInputValidator'
 
 export default class AuthController {
-  constructor() {}
+  constructor(private readonly userService: UserService = new UserService()) {}
+  /*-------------------------------------------------------
+  | @AuthController class
+  | @Features:
+  |   - Login
+  |   - Register
+  |   - Logout
+  |   - WhoAmI
+  |   - Verify Email
+  |   - Resend Email Verification
+  |   - Update Profile (TODO)
+  |   - Update Password (TODO)
+  |   - Forgot/Reset Password (TODO)
+  *-------------------------------------------------------*/
 
   // WHOAMI
   public async whoAmI({ auth }: HttpContextContract) {
@@ -50,7 +63,7 @@ export default class AuthController {
     | @Sanitized:  Validating user-inputs
     | @Auth:       Registering new user!
     *-------------------------------------------------------*/
-    const user = await User.create(payload)
+    const user = await this.userService.create(payload)
     const token = await auth.use('api').login(user, {
       expiresIn: '10 days',
     })
@@ -73,11 +86,8 @@ export default class AuthController {
     }
 
     // update user's email verify status
-    await User.findByOrFail('email', request.params().email)
-      .then((user) => {
-        user.isEmailVerified = true
-        user.save()
-      })
+    await this.userService
+      .makeEmailVerified(request.params().email)
       .then(() => {
         return response.accepted({ message: 'Email verified successfully!' })
       })
@@ -114,44 +124,15 @@ export default class AuthController {
       })
     ).html
 
-    // set queue :: enqueue to send email
+    // enqueue to send a email
     await Mail.sendLater((mail) => {
       mail
         .to(email)
-        .from('noreply@mahabub.api')
-        .subject('AdonisJS API - Email Verification!')
+        .from('noreply@company.mail', 'XCompany')
+        .subject('XCompany - Email Verification!')
         .html(rendered)
     })
 
     return { message: 'Email verification link has been sent successfully!' }
   }
-
-  // FORGOT Password :: Request
-  // public async forgotPassword({ request }: HttpContextContract) {
-  //   /*-------------------------------------------------------
-  //   | @Sanitized:  Validating user-inputs
-  //   | @Auth:       Make forgot => password/reset request
-  //   *-------------------------------------------------------*/
-  //   const { email } = await request.validate({
-  //     schema: schema.create({
-  //       email: schema.string({ trim: true }, [
-  //         rules.email(),
-  //         rules.exists({ table: 'users', column: 'email' }),
-  //       ]),
-  //     }),
-  //   })
-
-  //   // compose email
-  //   // const resetLink = Route.makeSignedUrl('resetPassword', {
-  //   //   email, // if your model has 'name' property, you can pass it here
-  //   //   expiresIn: '30m',
-  //   // })
-
-  //   // const rendered = mjml(
-  //   //   await View.render('reset_password', {
-  //   //     name: email,
-  //   //     resetLink: `${Env.get('DOMAIN')}${resetLink}`,
-  //   //   })
-  //   // ).html
-  // }
 }

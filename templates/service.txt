@@ -15,11 +15,39 @@ export class {{name}} {
   constructor(private readonly model = {{model}}) {}
 
   /**
+   * Create a new {{model}}
+   * @params payload Partial<{{model}}>
+   * @returns Promise<{{model}}>
+   */
+  public async create(payload: Partial<{{model}}>) {
+    return this.model.create(payload)
+  }
+
+  /**
    * Get one by id
    * @param id number
    * @returns Promise<{{model}}>
    */
   public async getById(id: number) {
     return this.model.findOrFail(id)
+  }
+
+  /**
+   * Update a {{model}}
+   * @param id number
+   * @param payload Partial<{{model}}>
+   * @returns Promise<any[]>
+   */
+  public async update(id: number, payload: Partial<{{model}}>) {
+    return this.model.query().where('id', id).update(payload)
+  }
+
+  /**
+   * Remove a {{model}}
+   * @param id number
+   * @returns Promise<any[]>
+   */
+  public async delete(id: number) {
+    return this.model.query().where('id', id).delete()
   }
 }
