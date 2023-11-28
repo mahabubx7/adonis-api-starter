@@ -1,7 +1,6 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import { UserService, MailService, TokenService } from 'App/Services'
-import Hash from '@ioc:Adonis/Core/Hash'
 import ChangePasswordInput from 'App/Validators/ChangePasswordInput'
 import LoginInputValidator from 'App/Validators/LoginInputValidator'
 import RegisterInputValidator from 'App/Validators/RegisterInputValidator'
@@ -104,7 +103,7 @@ export default class AuthController {
 
     // verify OTP
     const payload = await TokenService.verifyOtp(otp)
-    if (!payload) {
+    if (!payload || payload.type !== 'email_verification') {
       return response.badRequest({ message: 'Invalid or expired OTP!' })
     }
 
@@ -121,8 +120,12 @@ export default class AuthController {
 
   // Change Password
   public async changePassword({ request, auth, response }: HttpContextContract) {
+    /*-------------------------------------------------------
+    | @Sanitized:  Validating user-request inputs
+    | @Auth:       Change user's password
+    *-------------------------------------------------------*/
     const { current, password } = await request.validate(ChangePasswordInput)
-    const { id } = await auth.use('api').authenticate()
+    const { id, email } = await auth.use('api').authenticate()
     if (!auth.isAuthenticated) {
       return response.unauthorized({ message: 'You are not authorized!' })
     }
@@ -132,11 +135,13 @@ export default class AuthController {
       return response.badRequest({ message: 'Current password not matched!' })
     }
 
-    // send a notify email to user
+    // send a notify email to the user
+    await MailService.sendNotification(email, email, 'Password changed successfully!')
+
     return response.accepted({ message: 'Password changed successfully!' })
   }
 
-  // SEND Email Verification :: Resend
+  // Resend Email Verification
   public async resendEmailVerify({ request }: HttpContextContract) {
     /*-------------------------------------------------------
     | @Sanitized:  Validating user-inputs
@@ -160,5 +165,58 @@ export default class AuthController {
     await MailService.sendEmailVerification(email, email) // send email verification
 
     return { message: 'Email verification link has been sent successfully!' }
+  }
+
+  // Forgot Password
+  public async forgotPassword({ request, response }: HttpContextContract) {
+    /*-------------------------------------------------------
+    | @Sanitized:  Validating user-inputs
+    | @Auth:       Forgot password & reset request
+    *-------------------------------------------------------*/
+    const { email } = await request.validate({
+      schema: schema.create({
+        email: schema.string({ trim: true }, [
+          rules.email(),
+          rules.exists({ table: 'users', column: 'email' }),
+        ]),
+      }),
+    })
+
+    await MailService.sendResetPasswordOtp(email, email) // send email verification
+
+    return response.ok({
+      message: 'Please check your email & use the OTP to reset your password within 5 minutes!',
+    })
+  }
+
+  // Reset Password
+  public async resetPassword({ request, response }: HttpContextContract) {
+    /*-------------------------------------------------------
+    | @Sanitized:  Validating user inputs
+    | @Auth:       Reset user's password
+    *-------------------------------------------------------*/
+    // validate request inputs
+    const { otp, password } = await request.validate({
+      schema: schema.create({
+        otp: schema.string({ trim: true }, [rules.minLength(6)]),
+        password: schema.string({ trim: true }, [rules.minLength(6)]),
+        confirm: schema.string({ trim: true }, [rules.minLength(6), rules.confirmed('password')]),
+      }),
+    })
+
+    // verify OTP
+    const payload = await TokenService.verifyOtp(otp)
+    if (!payload || payload.type !== 'reset_password') {
+      return response.badRequest({ message: 'Invalid or expired OTP!' })
+    }
+
+    // update user's password
+    const update = await this.userService.resetPassword(payload.email, password)
+    if (!update) {
+      return response.internalServerError({ message: 'Something went wrong!' })
+    }
+
+    await MailService.sendNotification(payload.email, payload.email, 'Password reset successful!')
+    return response.accepted({ message: 'Password reset successful!' })
   }
 }

@@ -9,9 +9,13 @@ Route.group(() => {
 
   Route.get('/whoami', 'AuthController.whoAmI').as('whoami').middleware('auth')
 
-  Route.put('/change-password', 'AuthController.changePassword')
+  Route.put('/password/change', 'AuthController.changePassword')
     .as('changePassword')
     .middleware('auth')
+
+  Route.post('/password/forgot', 'AuthController.forgotPassword').as('forgotPassword')
+
+  Route.put('/password/reset', 'AuthController.resetPassword').as('resetPassword')
 
   Route.post('/verify/email', 'AuthController.verifyEmail').as('verifyEmail')
 

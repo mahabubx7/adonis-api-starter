@@ -17,7 +17,7 @@ export class UserService {
 
   /**
    * Create a new user
-   * @params user Partial<User>
+   * @params  user Partial<User>
    * @returns Promise<User>
    */
   public async create(user: Partial<User>) {
@@ -26,7 +26,7 @@ export class UserService {
 
   /**
    * Get one by id
-   * @param id number
+   * @param   id number
    * @returns Promise<User>
    */
   public async getById(id: number) {
@@ -35,7 +35,7 @@ export class UserService {
 
   /**
    * Get one by email address
-   * @param email string
+   * @param   email string
    * @returns Promise<User>
    */
   public async getByEmail(email: string) {
@@ -44,8 +44,8 @@ export class UserService {
 
   /**
    * Update a user
-   * @param id number
-   * @param user Partial<User>
+   * @param   id number
+   * @param   user Partial<User>
    * @returns Promise<any[]>
    */
   public async update(id: number, user: Partial<User>) {
@@ -54,7 +54,7 @@ export class UserService {
 
   /**
    * Update a user's email verification status
-   * @param email string
+   * @param   email string
    * @returns Promise<any[]>
    */
   public async makeEmailVerified(email: string) {
@@ -62,9 +62,9 @@ export class UserService {
   }
 
   /**
-   * Update user's password | Reset or Change
-   * @param id number
-   * @param pass string
+   * Update user's password
+   * @param   id number
+   * @param   pass string
    * @returns Promise<false | any[]>
    */
   public async changePassword(id: number, old: string, pass: string) {
@@ -74,12 +74,30 @@ export class UserService {
       return false // password not matched
     }
     const newPassword = await Hash.make(pass)
-    return this.model.query().where('id', id).update({ password: newPassword })
+    return await this.model.query().where('id', id).update({ password: newPassword })
+  }
+
+  /**
+   * Reset user's password
+   * @param   id number
+   * @param   pass string
+   * @returns Promise<boolean>
+   */
+  public async resetPassword(email: string, pass: string) {
+    const newPassword = await Hash.make(pass)
+    await this.model
+      .query()
+      .where('email', email)
+      .update({ password: newPassword })
+      .catch((err) => {
+        throw new Error(err)
+      })
+    return true
   }
 
   /**
    * Remove a user
-   * @param id number
+   * @param   id number
    * @returns Promise<any[]>
    */
   public async delete(id: number) {

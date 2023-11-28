@@ -7,6 +7,8 @@
 | This is a service class that can be used for unspecified
 | custom domain based services
 |
+| @Dependencies: Redis (for OTP with persisted information)
+|
 |*/
 
 import Redis from '@ioc:Adonis/Addons/Redis'
