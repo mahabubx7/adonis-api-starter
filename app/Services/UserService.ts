@@ -1,6 +1,17 @@
+/*
+|-------------------------------------------------------------
+| @UserService class
+| @Author: Mahabub (@mahabubx7)
+|-------------------------------------------------------------
+|
+| This is a service class that can be used to handle database
+| access layer delicately & handle necessary operations.
+|
+|*/
+
 import User from 'App/Models/User'
 
-export default class MyService {
+export class UserService {
   constructor(private readonly model = User) {}
 
   /**

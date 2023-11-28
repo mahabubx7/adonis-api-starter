@@ -1,6 +1,17 @@
+/*
+|-------------------------------------------------------------
+| @{{name}} class
+| @Author: Mahabub (@mahabubx7)
+|-------------------------------------------------------------
+|
+| This is a service class that can be used to handle database
+| access layer delicately & handle necessary operations.
+|
+|*/
+
 import {{model}} from 'App/Models/{{model}}'
 
-export default class MyService {
+export class {{name}} {
   constructor(private readonly model = {{model}}) {}
 
   /**
