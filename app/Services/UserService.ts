@@ -79,9 +79,9 @@ export class UserService {
 
   /**
    * Reset user's password
-   * @param   id number
+   * @param   email string
    * @param   pass string
-   * @returns Promise<boolean>
+   * @returns Promise<boolean> (True if success)
    */
   public async resetPassword(email: string, pass: string) {
     const newPassword = await Hash.make(pass)

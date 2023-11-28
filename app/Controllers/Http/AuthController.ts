@@ -16,9 +16,8 @@ export default class AuthController {
   |   - WhoAmI
   |   - Verify Email
   |   - Resend Email Verification
-  |   - Update Profile (TODO)
-  |   - Update Password (TODO)
-  |   - Forgot/Reset Password (TODO)
+  |   - Update Password
+  |   - Forgot/Reset Password
   *-------------------------------------------------------*/
 
   // WHOAMI
