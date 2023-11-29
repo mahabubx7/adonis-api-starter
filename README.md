@@ -7,7 +7,7 @@
 - Service generator ✅ @custom using `@adonisjs` core/command tool
 - Token based (`Opaque`) ✅ for API authentication
 - OTP ✅ for email verification & others
-- ⌛Example authorization using `@adonisjs/bouncer` with Todo CRUD + Policy-based access-controls
+- Authorization ✅ using `@adonisjs/bouncer` with Todo CRUD + Policy-based access-controls
 - ⌛Swagger API docs implementation
 - ⌛Write completed Tests for `Unit`, `Integration` & `End-to-End (e2e)`
 - ⌛Compose with `docker-compose.yml` with additional containers
