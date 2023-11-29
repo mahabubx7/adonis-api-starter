@@ -28,4 +28,9 @@ export default class Todo extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
+
+  // get this Todo item owner
+  public get ownerId() {
+    return this.userId
+  }
 }

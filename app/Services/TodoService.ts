@@ -16,7 +16,7 @@ export class TodoService {
 
   /**
    * Create a new Todo
-   * @params payload Partial<Todo>
+   * @param payload Partial<Todo>
    * @returns Promise<Todo>
    */
   public async create(payload: Partial<Todo>) {
@@ -29,7 +29,7 @@ export class TodoService {
    * @returns Promise<Todo>
    */
   public async getById(id: number) {
-    return this.model.findOrFail(id).catch(() => false)
+    return this.model.findOrFail(id).catch(() => null)
   }
 
   /**
@@ -43,20 +43,31 @@ export class TodoService {
 
   /**
    * Update a Todo
-   * @param id number
+   * @param todo Todo
    * @param payload Partial<Todo>
-   * @returns Promise<any[]>
+   * @returns Promise<boolean>
    */
-  public async update(id: number, payload: Partial<Todo>) {
-    return this.model.query().where('id', id).update(payload)
+  public async update(todo: Todo, payload: Partial<Todo>) {
+    const updates = { ...todo, ...payload }
+    const result = await this.model
+      .updateOrCreate({ id: todo.id }, updates)
+      .then(() => true)
+      .catch(() => false)
+
+    return result
   }
 
   /**
    * Remove a Todo
-   * @param id number
-   * @returns Promise<any[]>
+   * @param todo Todo
+   * @returns Promise<boolean>
    */
-  public async delete(id: number) {
-    return this.model.query().where('id', id).delete()
+  public async remove(todo: Todo) {
+    const result = await todo
+      .delete()
+      .then(() => true)
+      .catch(() => false)
+
+    return result
   }
 }
