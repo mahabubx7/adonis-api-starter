@@ -22,11 +22,12 @@ import HealthCheck from '@ioc:Adonis/Core/HealthCheck'
 import Route from '@ioc:Adonis/Core/Route'
 
 Route.group(() => {
-  require('./v1') // @api-version :: 1
+  require('./v1') //  <--- API version [ 1 ]
 
+  // Health Check
   Route.get('health', async ({ response }) => {
     const report = await HealthCheck.getReport()
 
     return report.healthy ? response.ok(report) : response.badRequest(report)
   })
-}).prefix('api')
+}).prefix('api') // <--- API root prefix

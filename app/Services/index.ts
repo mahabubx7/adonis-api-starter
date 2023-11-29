@@ -16,3 +16,5 @@ export * from './UserService'
 export * from './MailService'
 
 export * from './TokenService'
+
+export * from './TodoService'
