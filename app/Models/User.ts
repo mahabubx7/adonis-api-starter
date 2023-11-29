@@ -15,13 +15,15 @@ export default class User extends BaseModel {
   public password: string
 
   @column({ serializeAs: null })
+  // @no-swagger
   public rememberMeToken?: string
 
   @column()
   public isEmailVerified?: boolean
 
   @column()
-  public role: Role[keyof Role]
+  // @enum(user, auditor, admin, super_admin)
+  public role: string
 
   // has-many relation: Todo[]
   @hasMany(() => Todo)
@@ -42,21 +44,25 @@ export default class User extends BaseModel {
   }
 
   // check if user is USER | Customer
+  // @no-swagger
   public get isCustomer() {
     return this.role === Role.USER
   }
 
   // check if user is ADMIN
+  // @no-swagger
   public get isAdmin() {
     return this.role === Role.ADMIN
   }
 
   // check if user is AUDITOR
+  // @no-swagger
   public get isAuditor() {
     return this.role === Role.AUDITOR
   }
 
   // check if user is SUPER . ADMIN
+  // @no-swagger
   public get isSuperAdmin() {
     return this.role === Role.SUPER_ADMIN
   }

@@ -15,8 +15,8 @@
 - ⌛(OPTIONAL): Integrate with BullMQ or Bull for Queue instead of InMemory-Adonis-Queue for sending emails
 - ⌛(OPTIONAL): Implement query caching with redis + adonis/lucid-orm internals (if possible)
 
-
 ##### Latest updates as screenshoots:
+
 > Email SS with `mailtrip`
 
 ![Screenshot 2023-11-28 231810](https://github.com/mahabubx7/adonis-api-starter/assets/122348996/98fe1d4d-1a93-4f45-8f07-b7bed2020f96)
