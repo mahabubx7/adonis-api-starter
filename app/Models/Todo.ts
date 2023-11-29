@@ -7,6 +7,7 @@ export default class Todo extends BaseModel {
   public id: number
 
   @column({ serializeAs: null })
+  // @no-swagger
   public userId: number
 
   @column()
@@ -16,7 +17,7 @@ export default class Todo extends BaseModel {
   public isCompleted: boolean
 
   @column()
-  public description: string | null
+  public description?: string
 
   // belongsTo relation: User
   // @foreignKey: userId [By default] (converted to 'user_id' in database query time)
@@ -30,6 +31,7 @@ export default class Todo extends BaseModel {
   public updatedAt: DateTime
 
   // get this Todo item owner
+  // @no-swagger
   public get ownerId() {
     return this.userId
   }

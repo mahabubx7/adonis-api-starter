@@ -5,9 +5,11 @@
   "scripts": {
     "dev": "node ace serve --watch",
     "build": "node ace build --production",
+    "postbuild": "cp swagger.yml build/",
     "start": "node server.js",
     "test": "node ace test",
     "lint": "eslint . --ext=.ts",
+    "lint:fix": "eslint . --ext=.ts --fix",
     "format": "prettier --write ."
   },
   "eslintConfig": {
@@ -65,6 +67,7 @@
     "@adonisjs/redis": "^7.3.4",
     "@adonisjs/repl": "^3.1.0",
     "@adonisjs/view": "^6.2.0",
+    "adonis-autoswagger": "^1.8.1",
     "luxon": "^3.4.4",
     "mjml": "^4.14.1",
     "pg": "^8.11.3",

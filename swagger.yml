@@ -1,0 +1,419 @@
+openapi: '3.0.0'
+info:
+  title: 'AdonisJs (demo) API Documentation'
+  version: '1.0.0'
+components:
+  responses:
+    Forbidden:
+      description: 'Access token is missing or invalid'
+    Accepted:
+      description: 'The request was accepted'
+    Created:
+      description: 'The resource has been created'
+    NotFound:
+      description: 'The resource has been created'
+    NotAcceptable:
+      description: 'The resource has been created'
+  securitySchemes:
+    BearerAuth:
+      type: 'http'
+      scheme: 'bearer'
+  schemas:
+    Any:
+      description: 'Any JSON object not defined as schema'
+    Todo:
+      type: 'object'
+      properties:
+        id:
+          type: 'number'
+          example: 995
+        title:
+          type: 'string'
+          example: 'Lorem Ipsum'
+        is_completed:
+          type: 'boolean'
+          example: true
+        description:
+          type: 'string'
+          example: 'Lorem ipsum dolor sit amet'
+        user:
+          $ref: '#/components/schemas/User'
+          example: 'string'
+        created_at:
+          type: 'string'
+          example: '2021-03-23T16:13:08.489+01:00'
+          format: 'date-time'
+        updated_at:
+          type: 'string'
+          example: '2021-03-23T16:13:08.489+01:00'
+          format: 'date-time'
+        owner_id:
+          type: 'string'
+          example: 'string'
+      description: 'Model'
+    User:
+      type: 'object'
+      properties:
+        id:
+          type: 'number'
+          example: 396
+        email:
+          type: 'string'
+          example: 'johndoe@example.com'
+          format: 'email'
+        is_email_verified:
+          type: 'boolean'
+          example: true
+        role:
+          type: 'string'
+          example: 'user'
+          enum:
+            - 'user'
+            - 'auditor'
+            - 'admin'
+            - 'super_admin'
+        todos:
+          type: 'array'
+          items:
+            $ref: '#/components/schemas/Todo'
+            example: 'string'
+        created_at:
+          type: 'string'
+          example: '2021-03-23T16:13:08.489+01:00'
+          format: 'date-time'
+        updated_at:
+          type: 'string'
+          example: '2021-03-23T16:13:08.489+01:00'
+          format: 'date-time'
+      description: 'Model'
+paths:
+  /uploads/*:
+    get:
+      summary: ' (route.ts)'
+      description: ''
+      parameters: []
+      tags: []
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json: {}
+      security: []
+  /api/v1/auth/login:
+    post:
+      summary: ' (AuthController::login)'
+      description: ''
+      parameters: []
+      tags:
+        - 'AUTH'
+      responses:
+        202:
+          content:
+            application/json:
+              schema:
+                type: 'object'
+              example:
+                message: 'string'
+                token:
+                  type: 'bearer'
+                  token: 'string'
+                  expiresIn: 'string'
+          description: 'Accepted: {"message":"string","token":{"type":"bearer","token":"string","expiresIn":"string"}}'
+        400:
+          content:
+            application/json:
+              schema:
+                type: 'object'
+              example:
+                errors:
+                  message: 'error_message'
+          description: 'Bad Request: {"errors": {"message": "error_message"}}'
+      security: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: 'object'
+            example:
+              email: 'john.doe@gmail.com'
+              password: 'xxxxxxxx'
+  /api/v1/auth/register:
+    post:
+      summary: ' (AuthController::register)'
+      description: ''
+      parameters: []
+      tags:
+        - 'AUTH'
+      responses:
+        201:
+          description: 'Created'
+          content:
+            application/json: {}
+      security: []
+      requestBody:
+        content:
+          application/json: {}
+  /api/v1/auth/logout:
+    delete:
+      summary: ' (AuthController::logout)'
+      description: ''
+      parameters: []
+      tags:
+        - 'AUTH'
+      responses:
+        202:
+          description: 'Accepted'
+          content:
+            application/json: {}
+      security: []
+  /api/v1/auth/whoami:
+    get:
+      summary: ' (AuthController::whoAmI)'
+      description: 'Returns a **single** instance of type `User` **without** any _relations_. Take a look at the example for further details.'
+      parameters: []
+      tags:
+        - 'AUTH'
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              example:
+                id: 396
+                email: 'johndoe@example.com'
+                is_email_verified: true
+                role: 'user'
+                created_at: '2021-03-23T16:13:08.489+01:00'
+                updated_at: '2021-03-23T16:13:08.489+01:00'
+          description: 'Returns a **single** instance of type `User` **without** any _relations_. Take a look at the example for further details.'
+        401:
+          content:
+            application/json:
+              schema:
+                type: 'object'
+              example:
+                errors:
+                  message: 'error_message'
+          description: 'Unauthorized: {"errors": {"message": "error_message"}}'
+        403:
+          description: 'Forbidden'
+      security:
+        - BearerAuth:
+            - 'access'
+  /api/v1/auth/password/change:
+    put:
+      summary: ' (AuthController::changePassword)'
+      description: ''
+      parameters: []
+      tags:
+        - 'AUTH'
+      responses:
+        401:
+          description: 'Unauthorized'
+        403:
+          description: 'Forbidden'
+      security:
+        - BearerAuth:
+            - 'access'
+      requestBody:
+        content:
+          application/json: {}
+  /api/v1/auth/password/forgot:
+    post:
+      summary: ' (AuthController::forgotPassword)'
+      description: ''
+      parameters: []
+      tags:
+        - 'AUTH'
+      responses:
+        201:
+          description: 'Created'
+          content:
+            application/json: {}
+      security: []
+      requestBody:
+        content:
+          application/json: {}
+  /api/v1/auth/password/reset:
+    put:
+      summary: ' (AuthController::resetPassword)'
+      description: ''
+      parameters: []
+      tags:
+        - 'AUTH'
+      responses:
+        204:
+          description: 'No Content'
+          content:
+            application/json: {}
+      security: []
+      requestBody:
+        content:
+          application/json: {}
+  /api/v1/auth/verify/email:
+    post:
+      summary: ' (AuthController::verifyEmail)'
+      description: ''
+      parameters: []
+      tags:
+        - 'AUTH'
+      responses:
+        201:
+          description: 'Created'
+          content:
+            application/json: {}
+      security: []
+      requestBody:
+        content:
+          application/json: {}
+  /api/v1/auth/verify/resend:
+    post:
+      summary: ' (AuthController::resendEmailVerify)'
+      description: ''
+      parameters: []
+      tags:
+        - 'AUTH'
+      responses:
+        201:
+          description: 'Created'
+          content:
+            application/json: {}
+      security: []
+      requestBody:
+        content:
+          application/json: {}
+  /api/v1/todo:
+    post:
+      summary: ' (TodosController::createTodo)'
+      description: ''
+      parameters: []
+      tags:
+        - 'TODO'
+      responses:
+        401:
+          description: 'Unauthorized'
+        403:
+          description: 'Forbidden'
+      security:
+        - BearerAuth:
+            - 'access'
+      requestBody:
+        content:
+          application/json: {}
+    get:
+      summary: ' (TodosController::getTodos)'
+      description: ''
+      parameters: []
+      tags:
+        - 'TODO'
+      responses:
+        401:
+          description: 'Unauthorized'
+        403:
+          description: 'Forbidden'
+      security:
+        - BearerAuth:
+            - 'access'
+  /api/v1/todo/{id}:
+    get:
+      summary: ' (TodosController::getTodo)'
+      description: ''
+      parameters:
+        - in: 'path'
+          name: 'id'
+          schema:
+            type: 'string'
+          required: true
+      tags:
+        - 'TODO'
+      responses:
+        401:
+          description: 'Unauthorized'
+        403:
+          description: 'Forbidden'
+      security:
+        - BearerAuth:
+            - 'access'
+    put:
+      summary: ' (TodosController::updateTodo)'
+      description: ''
+      parameters:
+        - in: 'path'
+          name: 'id'
+          schema:
+            type: 'string'
+          required: true
+      tags:
+        - 'TODO'
+      responses:
+        401:
+          description: 'Unauthorized'
+        403:
+          description: 'Forbidden'
+      security:
+        - BearerAuth:
+            - 'access'
+      requestBody:
+        content:
+          application/json: {}
+    delete:
+      summary: ' (TodosController::deleteTodo)'
+      description: ''
+      parameters:
+        - in: 'path'
+          name: 'id'
+          schema:
+            type: 'string'
+          required: true
+      tags:
+        - 'TODO'
+      responses:
+        401:
+          description: 'Unauthorized'
+        403:
+          description: 'Forbidden'
+      security:
+        - BearerAuth:
+            - 'access'
+  /api/health:
+    get:
+      summary: ' (route.ts)'
+      description: ''
+      parameters: []
+      tags: []
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json: {}
+      security: []
+  /api/docs.yml:
+    get:
+      summary: ' (route.ts)'
+      description: ''
+      parameters: []
+      tags: []
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json: {}
+      security: []
+  /api/docs:
+    get:
+      summary: ' (route.ts)'
+      description: ''
+      parameters: []
+      tags: []
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json: {}
+      security: []
+tags:
+  - name: 'AUTH'
+    description: 'Everything related to AUTH'
+  - name: 'TODO'
+    description: 'Everything related to TODO'

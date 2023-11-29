@@ -6,7 +6,13 @@ import UpdateTodoDto from 'App/Validators/UpdateTodoDto'
 export default class TodosController {
   constructor(private readonly todoService: TodoService = new TodoService()) {}
 
-  // CREATE
+  /**
+   * @createTodo
+   * @summery Add new Todo item
+   * @requestBody <Todo>.exclude(id,created_at,updated_at)
+   * @responseBody 201 - <Todo> - Success
+   * @responseBody 401 - {"errors": [{"message": "error_message"}]}
+   */
   public async createTodo({ request, auth, bouncer, response }: HttpContextContract) {
     /*-------------------------------------------------------------*
     | @Todo:        Create a new todo
@@ -20,7 +26,12 @@ export default class TodosController {
     return response.created({ message: 'Todo created successfully!', todo })
   }
 
-  // GET ALL
+  /**
+   * @getTodos
+   * @summery Get user's own Todo list
+   * @responseBody 200 - <Todo[]> - Success
+   * @responseBody 401 - {"errors": [{"message": "error_message"}]}
+   */
   public async getTodos({ auth, bouncer }: HttpContextContract) {
     /*-------------------------------------------------------------*
     | @Todo:        Get all todos of current user
@@ -32,7 +43,15 @@ export default class TodosController {
     return { todos }
   }
 
-  // GET ONE
+  /**
+   * @getTodo
+   * @summery Read a Todo item
+   * @paramPath id - Todo item id (number)
+   * @responseBody 200 - <Todo[]> - Success
+   * @responseBody 401 - {"errors": [{"message": "error_message"}]}
+   * @responseBody 403 - {"errors": [{"message": "error_message"}]}
+   * @responseBody 404 - {"errors": [{"message": "error_message"}]}
+   */
   public async getTodo({ request, bouncer, response }: HttpContextContract) {
     /*-------------------------------------------------------------*
     | @Todo:        Get one todo item
@@ -46,7 +65,17 @@ export default class TodosController {
     return { todo }
   }
 
-  // UPDATE
+  /**
+   * @updateTodo
+   * @summery Update a Todo item
+   * @paramPath id - Todo item id (number)
+   * @requestBody <Todo>.exclude(id,created_at,updated_at)
+   * @responseBody 202 - {"message":"string"} - Success
+   * @responseBody 400 - {"errors": [{"message": "error_message"}]}
+   * @responseBody 401 - {"errors": [{"message": "error_message"}]}
+   * @responseBody 403 - {"errors": [{"message": "error_message"}]}
+   * @responseBody 404 - {"errors": [{"message": "error_message"}]}
+   */
   public async updateTodo({ request, bouncer, response }: HttpContextContract) {
     /*-------------------------------------------------------------*
     | @Todo:        Update a todo item
@@ -63,7 +92,17 @@ export default class TodosController {
     return response.accepted({ message: 'Todo updated successfully!' })
   }
 
-  // DELETE
+  /**
+   * @deleteTodo
+   * @summery Delete a Todo item
+   * @paramPath id - Todo item id (number)
+   * @requestBody <Todo>.exclude(id,created_at,updated_at)
+   * @responseBody 202 - {"message":"string"} - Success
+   * @responseBody 400 - {"errors": [{"message": "error_message"}]}
+   * @responseBody 401 - {"errors": [{"message": "error_message"}]}
+   * @responseBody 403 - {"errors": [{"message": "error_message"}]}
+   * @responseBody 404 - {"errors": [{"message": "error_message"}]}
+   */
   public async deleteTodo({ request, bouncer, response }: HttpContextContract) {
     /*-------------------------------------------------------------*
     | @Todo:        Delete a todo item
