@@ -16,8 +16,8 @@
 - ⌛(OPTIONAL): Implement query caching with redis + adonis/lucid-orm internals (if possible)
 
 ##### Latest updates as screenshoots:
-<div width="100%">
+<p>
   <img width="240" align="left" src="https://github.com/mahabubx7/adonis-api-starter/assets/122348996/98fe1d4d-1a93-4f45-8f07-b7bed2020f96" alt="email-ss" />
-  <img width="560" align="right" src="https://github.com/mahabubx7/adonis-api-starter/assets/122348996/5ad17ee9-1f8d-4ae4-b187-6a9fb6b9132e" alt="api-doc-ss" />
-</div>
+  <img width="560" align="left" src="https://github.com/mahabubx7/adonis-api-starter/assets/122348996/5ad17ee9-1f8d-4ae4-b187-6a9fb6b9132e" alt="api-doc-ss" />
+</p>
 
