@@ -3,11 +3,12 @@ node_modules
 build
 coverage
 
-# Custom
-!templates/*
-
 # OS & Others
 .vscode
 .DS_STORE
 .env
 tmp
+
+# Custom
+!templates/*
+!.vscode/*
