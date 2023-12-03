@@ -90,7 +90,7 @@ export default class AuthController {
     const find = await this.userService.getByEmail(payload.email)
     if (find) {
       // email already exists
-      return response.badRequest({ errors: [{ message: 'Email already exists!' }] })
+      return response.badRequest({ message: 'Email already exists!' })
     }
 
     const user = await this.userService.create(payload)

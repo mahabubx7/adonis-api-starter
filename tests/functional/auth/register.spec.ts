@@ -5,7 +5,7 @@ test.group('register', async () => {
   const apiPrefix = '/api/v1' // <-- API prefix
 
   // Test: Registration successful!
-  test('register: successful!', async ({ assert, client }) => {
+  test('register: should be successful!', async ({ assert, client }) => {
     const mailer = Mail.fake() // <-- Fake mailer
 
     const response = await client.post(apiPrefix + '/auth/register').form({
@@ -36,7 +36,7 @@ test.group('register', async () => {
   })
 
   // Test: Registration invalid request!
-  test('register: invalid request!', async ({ client }) => {
+  test('register: should be invalid request!', async ({ client }) => {
     const response = await client.post(apiPrefix + '/auth/register').form({
       email: 'testing@user.com',
       password: '12345678',
@@ -56,7 +56,7 @@ test.group('register', async () => {
   })
 
   // Test: Registration email already exists!
-  test('register: email already exists!', async ({ client }) => {
+  test('register: should return email already exists!', async ({ client }) => {
     const response = await client.post(`${apiPrefix}/auth/register`).form({
       email: 'test@user.com', // <-- Existing email from the database (while seeded)
       password: '12345678',

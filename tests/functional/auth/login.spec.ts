@@ -4,7 +4,7 @@ test.group('login', () => {
   const apiPrefix = '/api/v1'
 
   // Test: Login successful request!
-  test('login: successful!', async ({ client }) => {
+  test('login: should be successful!', async ({ client }) => {
     const response = await client.post(`${apiPrefix}/auth/login`).form({
       email: 'test@user.com',
       password: '12345678',
@@ -23,7 +23,7 @@ test.group('login', () => {
   })
 
   // Test: Login invalid request!
-  test('login: wrong-password check!', async ({ client }) => {
+  test('login: should check if wrong-password!', async ({ client }) => {
     const response = await client.post(`${apiPrefix}/auth/login`).form({
       email: 'test@user.com',
       password: 'xxxxxxxx', // <-- Wrong password
@@ -40,7 +40,7 @@ test.group('login', () => {
   })
 
   // Test: Login user not found!
-  test('login: user-404', async ({ client }) => {
+  test('login: should check user exists? or not', async ({ client }) => {
     const response = await client.post(`${apiPrefix}/auth/login`).form({
       email: 'test00@user.com', // <-- Wrong email or user doesn't exist
       password: 'xxxxxxxx',

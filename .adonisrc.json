@@ -48,6 +48,13 @@
           "tests/auth/register/**/*.spec(.ts|.js)"
         ],
         "timeout": 60000
+      },
+      {
+        "name": "function",
+        "files": [
+          "auth/logout/**/*.spec(.ts|.js)"
+        ],
+        "timeout": 60000
       }
     ]
   },
