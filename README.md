@@ -9,7 +9,7 @@
 - OTP ✅ for email verification & others
 - Authorization ✅ using `@adonisjs/bouncer` with Todo CRUD + Policy-based access-controls
 - Swagger API docs ✅ implementation with `autogen-swagger` from adonisjs-community-packages
-- ⌛Write completed Tests for `Unit`, `Integration` & `End-to-End (e2e)`
+- ✅ Write completed Tests for `Unit` & `Integration` (named as 'functional').
 - ⌛Compose with `docker-compose.yml` with additional containers
 - ⌛Use `@adonisjs/driver-s3` as file storage like `aws-s3` or `MinIO`
 - ⌛(OPTIONAL): Integrate with BullMQ or Bull for Queue instead of InMemory-Adonis-Queue for sending emails
