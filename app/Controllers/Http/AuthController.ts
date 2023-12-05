@@ -20,7 +20,12 @@ export default class AuthController {
   |   - Forgot/Reset Password
   *-------------------------------------------------------*/
 
-  // WHOAMI
+  /**
+   * @whoAmI
+   * @summery Get authenticated user's details
+   * @responseBody 200 - <User> - Success
+   * @responseBody 401 - {"errors": [{"message": "error_message"}]}
+   */
   public async whoAmI({ auth }: HttpContextContract) {
     /*-------------------------------------------------------
     | @Auth:  Already authenticated from route => middleware
@@ -28,7 +33,13 @@ export default class AuthController {
     return auth.user
   }
 
-  // LOGIN
+  /**
+   * @login
+   * @summery Login a user
+   * @requestBody { "email": "john.doe@gmail.com", "password": "xxxxxxxx" }
+   * @responseBody 202 - {"message":"string","token":{"type":"bearer","token":"string","expiresIn":"string"}}
+   * @responseBody 400 - {"errors": [{"message": "error_message"}]}
+   */
   public async login({ request, auth, response }: HttpContextContract) {
     /*-------------------------------------------------------
     | @Sanitized:  Validating user-inputs
@@ -46,7 +57,12 @@ export default class AuthController {
     })
   }
 
-  // LOGOUT
+  /**
+   * @logout
+   * @summery Logout a user
+   * @responseBody 202 - {"message":"string","revoked":true}
+   * @responseBody 401 - {"errors": [{"message": "error_message"}]}
+   */
   public async logout({ auth, response }: HttpContextContract) {
     /*-------------------------------------------------------
     | @Auth:   Logout user & revoked token
@@ -58,13 +74,25 @@ export default class AuthController {
     })
   }
 
-  // REGISTER
+  /**
+   * @register
+   * @summery User registration
+   * @requestBody { "email": "john.doe@gmail.com", "password": "xxxxxxxx" }
+   * @responseBody 201 - {"message":"string","token":{"type":"bearer","token":"string","expiresIn":"string"},"user": {"id":1,"email":"john.doe@gmail.com","is_email_verified":false,"role":"user","created_at":"2021-09-30T06:59:59.000Z","updated_at":"2021-09-30T06:59:59.000Z"}}
+   * @responseBody 400 - {"errors": [{"message": "error_message"}]}
+   */
   public async register({ request, auth, response }: HttpContextContract) {
     const payload = await request.validate(RegisterInputValidator)
     /*-------------------------------------------------------
     | @Sanitized:  Validating user-inputs
     | @Auth:       Registering new user!
     *-------------------------------------------------------*/
+    const find = await this.userService.getByEmail(payload.email)
+    if (find) {
+      // email already exists
+      return response.badRequest({ message: 'Email already exists!' })
+    }
+
     const user = await this.userService.create(payload)
 
     const token = await auth.use('api').generate(user, {
@@ -87,7 +115,14 @@ export default class AuthController {
     })
   }
 
-  // VERIFY Email
+  /**
+   * @verifyEmail
+   * @summery Verify user's email by validating OTP
+   * @requestBody { "otp": "123456" }
+   * @responseBody 202 - {"message":"string"}
+   * @responseBody 400 - {"errors": [{"message": "error_message"}]}
+   * @responseBody 500 - {"errors": [{"message": "error_message"}]}
+   */
   public async verifyEmail({ request, response }: HttpContextContract) {
     /*-------------------------------------------------------
     | @Sanitized:  Validating user-request OTP
@@ -117,7 +152,14 @@ export default class AuthController {
       })
   }
 
-  // Change Password
+  /**
+   * @changePassword
+   * @summery Change current password
+   * @requestBody { "current": "xxxxxxxx", "password": "xxxxxxxx", "confirm": "xxxxxxxx" }
+   * @responseBody 202 - {"message":"string"}
+   * @responseBody 401 - {"errors": [{"message": "error_message"}]}
+   * @responseBody 400 - {"errors": [{"message": "error_message"}]}
+   */
   public async changePassword({ request, auth, response }: HttpContextContract) {
     /*-------------------------------------------------------
     | @Sanitized:  Validating user-request inputs
@@ -125,9 +167,6 @@ export default class AuthController {
     *-------------------------------------------------------*/
     const { current, password } = await request.validate(ChangePasswordInput)
     const { id, email } = await auth.use('api').authenticate()
-    if (!auth.isAuthenticated) {
-      return response.unauthorized({ message: 'You are not authorized!' })
-    }
     const update = await this.userService.changePassword(id, current, password)
 
     if (!update) {
@@ -140,7 +179,13 @@ export default class AuthController {
     return response.accepted({ message: 'Password changed successfully!' })
   }
 
-  // Resend Email Verification
+  /**
+   * @resendEmailVerify
+   * @summery Resend email verification link
+   * @requestBody {"email": "john.doe@gmail.com"}
+   * @responseBody 200 - {"message":"string"}
+   * @responseBody 422 - {"errors": [{"message": "error_message"}]}
+   */
   public async resendEmailVerify({ request }: HttpContextContract) {
     /*-------------------------------------------------------
     | @Sanitized:  Validating user-inputs
@@ -166,7 +211,13 @@ export default class AuthController {
     return { message: 'Email verification link has been sent successfully!' }
   }
 
-  // Forgot Password
+  /**
+   * @forgotPassword
+   * @summery Forgot password & reset request
+   * @requestBody {"email": "john.doe@gmail.com"}
+   * @responseBody 200 - {"message":"string"}
+   * @responseBody 422 - {"errors": [{"message": "error_message"}]}
+   */
   public async forgotPassword({ request, response }: HttpContextContract) {
     /*-------------------------------------------------------
     | @Sanitized:  Validating user-inputs
@@ -188,7 +239,14 @@ export default class AuthController {
     })
   }
 
-  // Reset Password
+  /**
+   * @resetPassword
+   * @summery Reset request with OTP & new password
+   * @requestBody {"otp": "123456","password": "xxxxxxxx","confirm": "xxxxxxxx"}
+   * @responseBody 202 - {"message":"string"}
+   * @responseBody 400 - {"errors": [{"message": "error_message"}]}
+   * @responseBody 500 - {"errors": [{"message": "error_message"}]}
+   */
   public async resetPassword({ request, response }: HttpContextContract) {
     /*-------------------------------------------------------
     | @Sanitized:  Validating user inputs
