@@ -40,4 +40,8 @@ Route.group(() => {
   Route.get('/docs', async () => {
     return AutoSwagger.ui('/api/docs.yml')
   }) // <--- API docs in Swagger/OpenAPI UI format
+
+  Route.get('/', async () => {
+    return { hello: 'world' }
+  }) // <-- API root :: for Hello World
 }).prefix('api') // <--- API root prefix

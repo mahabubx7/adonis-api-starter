@@ -87,6 +87,12 @@ export default class AuthController {
     | @Sanitized:  Validating user-inputs
     | @Auth:       Registering new user!
     *-------------------------------------------------------*/
+    const find = await this.userService.getByEmail(payload.email)
+    if (find) {
+      // email already exists
+      return response.badRequest({ message: 'Email already exists!' })
+    }
+
     const user = await this.userService.create(payload)
 
     const token = await auth.use('api').generate(user, {

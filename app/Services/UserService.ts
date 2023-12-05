@@ -27,19 +27,19 @@ export class UserService {
   /**
    * Get one by id
    * @param   id number
-   * @returns Promise<User>
+   * @returns Promise<User | null>
    */
   public async getById(id: number) {
-    return this.model.findOrFail(id)
+    return this.model.findOrFail(id).catch(() => null)
   }
 
   /**
    * Get one by email address
    * @param   email string
-   * @returns Promise<User>
+   * @returns Promise<User | null>
    */
   public async getByEmail(email: string) {
-    return this.model.findByOrFail('email', email)
+    return this.model.findByOrFail('email', email).catch(() => null)
   }
 
   /**
