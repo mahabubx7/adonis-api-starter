@@ -1,18 +1,9 @@
-import Mail, { FakeMailManagerContract } from '@ioc:Adonis/Addons/Mail'
+import Mail from '@ioc:Adonis/Addons/Mail'
 import { test } from '@japa/runner'
+import { extractOtp } from '../../helpers'
 
 test.group('email-verify', () => {
   const apiPrefix = '/api/v1'
-
-  // OTP exactor from fake mailer
-  const extractOtp = function (mailer: FakeMailManagerContract) {
-    let otp: any = null
-    mailer.find((mail) => {
-      otp = mail.html?.match(/\d{6}/)![0]
-      return true
-    })
-    return otp
-  }
 
   // Email verification: verify OTP successfully
   test('email: should verify email from otp', async ({ client }) => {

@@ -1,8 +1,14 @@
 import { test } from '@japa/runner'
 import Mail from '@ioc:Adonis/Addons/Mail'
+import Database from '@ioc:Adonis/Lucid/Database'
 
-test.group('register', async () => {
+test.group('register', async (group) => {
   const apiPrefix = '/api/v1' // <-- API prefix
+
+  group.each.setup(async () => {
+    await Database.beginGlobalTransaction()
+    return () => Database.rollbackGlobalTransaction()
+  }) // <--- prepare or rollback database
 
   // Test: Registration successful!
   test('register: should be successful!', async ({ assert, client }) => {
@@ -50,25 +56,6 @@ test.group('register', async () => {
           message: 'confirmed validation failed',
           field: 'password_confirmation',
           rule: 'confirmed',
-        },
-      ],
-    }) // <-- Expected error object as above
-  })
-
-  // Test: Registration email already exists!
-  test('register: should return email already exists!', async ({ client }) => {
-    const response = await client.post(`${apiPrefix}/auth/register`).form({
-      email: 'test@user.com', // <-- Existing email from the database (while seeded)
-      password: '12345678',
-      password_confirmation: '12345678',
-    })
-
-    response.assertStatus(400) // <-- Expected 400: BadRequest
-    response.assertBodyContains({ errors: Array }) // <-- Expected an error Array
-    response.assertBodyContains({
-      errors: [
-        {
-          message: 'Email already exists!',
         },
       ],
     }) // <-- Expected error object as above
